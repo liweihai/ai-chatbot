@@ -3,7 +3,7 @@ import {
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from 'ai';
-import { xai } from '@ai-sdk/xai';
+import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import {
   artifactModel,
   chatModel,
@@ -11,6 +11,15 @@ import {
   titleModel,
 } from './models.test';
 import { isTestEnvironment } from '../constants';
+
+const provider = createOpenAICompatible({
+  name: 'provider',
+  apiKey: process.env.GLM4_API_KEY,
+  baseURL: process.env.GLM4_BASE_URL,
+  queryParams: {
+    'api-version': '1.0.0',
+  },
+});
 
 export const myProvider = isTestEnvironment
   ? customProvider({
@@ -23,15 +32,15 @@ export const myProvider = isTestEnvironment
     })
   : customProvider({
       languageModels: {
-        'chat-model': xai('grok-2-vision-1212'),
+        'chat-model': provider('glm-4-flash-250414'),
         'chat-model-reasoning': wrapLanguageModel({
-          model: xai('grok-3-mini-beta'),
+          model: provider('glm-4-flash-250414'),
           middleware: extractReasoningMiddleware({ tagName: 'think' }),
         }),
-        'title-model': xai('grok-2-1212'),
-        'artifact-model': xai('grok-2-1212'),
+        'title-model': provider('glm-4-flash-250414'),
+        'artifact-model': provider('glm-4-flash-250414'),
       },
       imageModels: {
-        'small-model': xai.imageModel('grok-2-image'),
+        'small-model': provider.imageModel('glm-4-flash-250414'),
       },
     });

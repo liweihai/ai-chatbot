@@ -221,6 +221,9 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof ChatSDKError) {
       return error.toResponse();
+    } else {
+      console.error(error);
+      return new ChatSDKError('bad_request:api').toResponse();
     }
   }
 }
